@@ -98,7 +98,7 @@ def rfid_scan():
 def rfid_verify():
     data = request.get_json()
 
-    user_id = data.get('user_id')
+    user_id = session.get('user_id')
     rfid_uid = data.get('rfid_uid')
 
     if not user_id or not rfid_uid:
