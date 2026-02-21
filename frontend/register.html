@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Register for Jumbopass</h1>
+        <form id="register-form">
+            Enter your desired password:
+            <input type="password" id="register-password" name="password" required>
+            <br>
+            Confirm password: 
+            <input type="password" id="confirm-password" name="confirm-password" required>
+            <br>
+            <button type="button" id="next">Next</button>
+        
+            <!-- hidden until Next is clicked -->
+            <div id="rfid-section" style="display:none;">
+                <p>Tap your card to register it...</p>
+                <input type="hidden" id="rfid-uid" name="rfid_uid">
+                <button type="submit" id="submit-btn" style="display:none;">Create Account</button>
+            </div>
+        </form>
+        <p>Already have an account?</p>
+        <button id="login-btn" onclick="window.location.href='index.html'">Sign In</button>
+    </div>
+    <script src="auth.js"></script>
+</body>
+</html>
