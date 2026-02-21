@@ -4,8 +4,8 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash BLOB NOT NULL,
   password_salt BLOB NOT NULL,
   kdf_params TEXT NOT NULL,
-  rfid_val TEXT
-)
+  rfid_uid TEXT
+);
 
 CREATE TABLE IF NOT EXISTS vault_entries (
   entry_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -20,4 +20,4 @@ CREATE TABLE IF NOT EXISTS vault_entries (
   last_updated TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
   created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
   FOREIGN KEY (user_id) REFERENCES users (user_id)
-)
+);

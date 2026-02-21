@@ -1,9 +1,10 @@
 import sqlite3
 
-conn = sqlite3.connect('vault.db')
+conn = sqlite3.connect('backend/db/vault.db')
 
-with open('schema.sql', 'r') as f:
-  conn.executescript(f.read())
+with open('backend/db/schema.sql', 'r') as f:
+  file = f.read()
 
+conn.executescript(file)
 conn.commit()
 conn.close()

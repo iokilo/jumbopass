@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 import bcrypt
-from database import get_db
+import sqlite3
 from rfid import read_rfid
 
 auth_bp = Blueprint('auth', __name__)
@@ -17,15 +17,16 @@ def register():
     if not username or not password or not rfid_uid:
         return jsonify({ 'success': False, 'message': 'All fields are required.' }), 400
 
-    try:
-        hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    try:  
+        salt = bcrypt.gensalt()
+        hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+        
+        conn = sqlite3.connect('vault.db')
+        cur = conn.cursor()
 
-        db = get_db()
-        db.execute(
-            "INSERT INTO users (username, password_hash, rfid_uid) VALUES (?, ?, ?)",
-            (username, hashed.decode('utf-8'), rfid_uid)
-        )
-        db.commit()
+        cur.execute('INSERT INTO users (username, password_hash, password_salt, rfid_uid) VALUES (?, ?, ?)', (username, hashed, salt, rfid_uid))
+        conn.commit()
+        conn.close()
 
         return jsonify({ 'success': True })
 
@@ -48,9 +49,11 @@ def login():
         return jsonify({ 'success': False, 'message': 'All fields are required.' }), 400
 
     try:
-        db = get_db()
-        user = db.execute(
-            "SELECT * FROM users WHERE username = ?", (username,)
+        conn = sqlite3.connect('vault.db')
+        cur = conn.cursor()
+
+        user = cur.execute(
+            'SELECT * FROM users WHERE username = ?', (username,)
         ).fetchone()
 
         if not user:
