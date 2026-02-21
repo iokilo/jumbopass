@@ -3,21 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Jumbopass</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<script src="auth.js"></script>
 <body>
     <div class="container">
         <h1>Welcome to Jumbopass</h1>
-        <form id="text-password">
+        <form id="login-form">
+            Enter your username:
+            <input type="text" id="username" name="username" required>
+            <br>
             Enter your password:
-            <input type="password" id="password" name="password">
+            <input type="password" id="password" name="password" required>
+            <br>
             <button type="submit">Submit</button>
         </form>
+
+        <div id="rfid-prompt" style="display:none;">
+            <p>Tap your card to complete login...</p>
+        </div>
+
         <p>Don't have an account?</p>
         <button id="register-btn" onclick="window.location.href='register.html'">Register an Account</button>
-        <!-- <p>Tap your card to log in</p> -->
-        
     </div>
+    <script src="auth.js"></script>
+</body>
 </html>

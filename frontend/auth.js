@@ -5,28 +5,64 @@ if (loginForm) {
     loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
+        const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
 
         try {
+            // verify password
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password })
+                body: JSON.stringify({ username, password })
             });
 
             const data = await response.json();
 
             if (data.success) {
-                console.log('Password correct, waiting for RFID...');
-                // TODO: show RFID prompt on login page
+                // password correct, show RFID prompt and start polling
+                document.getElementById('rfid-prompt').style.display = 'block';
+                loginForm.querySelector('button[type="submit"]').disabled = true;
+                pollLoginRFID(data.user_id);
             } else {
-                alert('Incorrect password. Try again.');
+                alert('Incorrect username or password. Try again.');
             }
         } catch (err) {
             console.error('Login error:', err);
             alert('Something went wrong. Please try again.');
         }
     });
+}
+
+async function pollLoginRFID(user_id) {
+    try {
+        // wait for RFID tap
+        const response = await fetch('/api/auth/rfid-scan');
+        const data = await response.json();
+
+        if (data.uid) {
+            // verify RFID matches the user
+            const verifyResponse = await fetch('/api/auth/rfid-verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id, rfid_uid: data.uid })
+            });
+
+            const verifyData = await verifyResponse.json();
+
+            if (verifyData.success) {
+                window.location.href = 'dashboard.html';
+            } else {
+                alert('RFID does not match. Access denied.');
+                loginForm.querySelector('button[type="submit"]').disabled = false;
+                document.getElementById('rfid-prompt').style.display = 'none';
+            }
+        } else {
+            setTimeout(() => pollLoginRFID(user_id), 1000);
+        }
+    } catch (err) {
+        console.error('RFID polling error:', err);
+        setTimeout(() => pollLoginRFID(user_id), 2000);
+    }
 }
 
 // ─── Register Page ────────────────────────────────────────────────────────────
@@ -48,14 +84,16 @@ if (nextBtn) {
         }
 
         document.getElementById('rfid-section').style.display = 'block';
-        nextBtn.disabled = true; // prevent double clicking
+        nextBtn.disabled = true;
         pollRFID();
     });
 }
 
+// scan for RFID every second until we get a UID, then show the submit button and message
 async function pollRFID() {
     try {
-        const response = await fetch('/api/auth/rfid-scan');
+        // SWAP TO rfid-scan WHEN READY
+        const response = await fetch('/api/auth/rfid-test');
         const data = await response.json();
 
         if (data.uid) {
@@ -67,7 +105,7 @@ async function pollRFID() {
         }
     } catch (err) {
         console.error('RFID polling error:', err);
-        setTimeout(pollRFID, 2000); // wait a bit longer on error before retrying
+        setTimeout(pollRFID, 2000);
     }
 }
 
@@ -76,6 +114,7 @@ if (registerForm) {
     registerForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
+        const username = document.getElementById('register-username').value;
         const password = document.getElementById('register-password').value;
         const rfid_uid = document.getElementById('rfid-uid').value;
 
@@ -85,16 +124,17 @@ if (registerForm) {
         }
 
         try {
+            console.log("registering");
             const response = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password, rfid_uid })
+                body: JSON.stringify({ username, password, rfid_uid })
             });
 
             const data = await response.json();
 
             if (data.success) {
-                window.location.href = 'index.html';
+                window.location.href = 'dashboard.html';
             } else {
                 alert('Registration failed: ' + data.message);
             }

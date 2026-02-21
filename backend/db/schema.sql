@@ -1,15 +1,16 @@
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
   user_id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL,
-  password_salt TEXT NOT NULL,
-  kdf_params TEXT NOT NULL,
-  rfid_val TEXT
-)
+  password_hash BLOB NOT NULL,
+  password_salt BLOB NOT NULL,
+  rfid_uid TEXT
+);
 
-CREATE TABLE vault_entries (
+CREATE TABLE IF NOT EXISTS vault_entries (
   entry_id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
+  category TEXT NOT NULL,
+  nonce TEXT NOT NULL,
   name TEXT NOT NULL,
   username TEXT NOT NULL,
   password TEXT NOT NULL,
@@ -17,5 +18,5 @@ CREATE TABLE vault_entries (
   notes TEXT,
   last_updated TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
   created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
-  FOREIGN KEY (user_id) REFERENCES users (user_id),
-)
+  FOREIGN KEY (user_id) REFERENCES users (user_id)
+);
