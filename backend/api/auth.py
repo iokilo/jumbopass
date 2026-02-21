@@ -3,6 +3,7 @@ import bcrypt
 import sqlite3
 from testrfid import read_rfid
 from rfid import await_scan
+import os
 
 auth_bp = Blueprint('auth', __name__)
 

@@ -140,7 +140,7 @@ if (registerForm) {
             const data = await response.json();
 
             if (data.success) {
-                window.location.href = 'dashboard.html';
+                window.location.href = 'index.html';
             } else {
                 alert('Registration failed: ' + data.message);
             }
