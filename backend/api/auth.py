@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 import bcrypt
 import sqlite3
-from rfid import read_rfid
+from testrfid import read_rfid
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -40,6 +40,7 @@ def register():
 
 @auth_bp.route('/api/auth/login', methods=['POST'])
 def login():
+    print('Login attempt received')
     data = request.get_json()
 
     username = data.get('username')
@@ -49,12 +50,17 @@ def login():
         return jsonify({ 'success': False, 'message': 'All fields are required.' }), 400
 
     try:
-        conn = sqlite3.connect('vault.db')
+        conn = sqlite3.connect('backend/db/vault.db')
         cur = conn.cursor()
 
         user = cur.execute(
-            'SELECT * FROM users WHERE username = ?', (username,)
+            'SELECT * FROM users WHERE username = ?', (username)
         ).fetchone()
+
+        
+
+        conn.commit()
+        conn.close()
 
         if not user:
             return jsonify({ 'success': False, 'message': 'Invalid credentials.' }), 401
