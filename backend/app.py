@@ -1,5 +1,6 @@
 import sys
 import os
+from dotenv import load_dotenv
 sys.path.insert(0, os.path.dirname(__file__))
 
 from flask import Flask, send_from_directory
@@ -10,6 +11,9 @@ app = Flask(__name__, static_folder='../frontend', static_url_path='')
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(vault_bp)
+
+load_dotenv()
+app.secret_key = os.environ["SECRET_KEY"]
 
 @app.route('/')
 def index():
