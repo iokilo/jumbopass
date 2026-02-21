@@ -30,9 +30,6 @@ def register():
 
         return jsonify({ 'success': True })
 
-    except db.IntegrityError:
-        return jsonify({ 'success': False, 'message': 'Username or RFID already exists.' }), 409
-
     except Exception as e:
         print('Register error:', e)
         return jsonify({ 'success': False, 'message': 'Server error.' }), 500
@@ -51,13 +48,12 @@ def login():
 
     try:
         conn = sqlite3.connect('backend/db/vault.db')
+        conn.row_factory = sqlite3.Row
         cur = conn.cursor()
 
         user = cur.execute(
-            'SELECT * FROM users WHERE username = ?', (username)
-        ).fetchone()
-
-        
+            'SELECT * FROM users WHERE username = ?', (username,)
+        ).fetchone()   
 
         conn.commit()
         conn.close()
@@ -65,11 +61,11 @@ def login():
         if not user:
             return jsonify({ 'success': False, 'message': 'Invalid credentials.' }), 401
 
-        if not bcrypt.checkpw(password.encode('utf-8'), user['password_hash'].encode('utf-8')):
+        if not bcrypt.checkpw(password.encode('utf-8'), user['password_hash']):
             return jsonify({ 'success': False, 'message': 'Invalid credentials.' }), 401
 
         # password is correct, frontend will now poll for RFID
-        return jsonify({ 'success': True, 'user_id': user['id'] })
+        return jsonify({ 'success': True, 'user_id': user['user_id'] })
 
     except Exception as e:
         print('Login error:', e)
@@ -102,10 +98,16 @@ def rfid_verify():
         return jsonify({ 'success': False, 'message': 'Missing fields.' }), 400
 
     try:
-        db = get_db()
-        user = db.execute(
-            "SELECT * FROM users WHERE id = ?", (user_id,)
+        conn = sqlite3.connect('backend/db/vault.db')
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+
+        user = cur.execute(
+            "SELECT * FROM users WHERE user_id = ?", (user_id,)
         ).fetchone()
+
+        conn.commit()
+        conn.close()
 
         if not user or user['rfid_uid'] != rfid_uid:
             return jsonify({ 'success': False, 'message': 'RFID does not match.' }), 401

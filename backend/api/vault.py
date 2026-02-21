@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify
-from database import get_db
 
 vault_bp = Blueprint('vault', __name__)
 

@@ -36,7 +36,7 @@ if (loginForm) {
 async function pollLoginRFID(user_id) {
     try {
         // wait for RFID tap
-        const response = await fetch('/api/auth/rfid-scan');
+        const response = await fetch('/api/auth/rfid-test');
         const data = await response.json();
 
         if (data.uid) {
