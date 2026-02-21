@@ -59,6 +59,8 @@ async function pollLoginRFID(user_id) {
         } else {
             // setTimeout(() => pollLoginRFID(user_id), 1000);
             alert('No RFID detected. Please try again.');
+            loginForm.querySelector('button[type="submit"]').disabled = false;
+            document.getElementById('rfid-prompt').style.display = 'none';
         }
     } catch (err) {
         console.error('RFID polling error:', err);
@@ -103,7 +105,9 @@ async function pollRFID() {
             document.getElementById('submit-btn').style.display = 'block';
         } else {
             // setTimeout(pollRFID, 1000);
-            alert('No RFID detected. Please try again.');
+            alert('No RFID detected to register. Please try again.');
+            nextBtn.disabled = false;
+            document.getElementById('rfid-section').style.display = 'none';
         }
     } catch (err) {
         console.error('RFID polling error:', err);
