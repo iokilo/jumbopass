@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 import bcrypt
 import sqlite3
 from testrfid import read_rfid
+from rfid import await_scan
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -75,10 +76,12 @@ def login():
 @auth_bp.route('/api/auth/rfid-scan', methods=['GET'])
 def rfid_scan():
     try:
-        uid = read_rfid()
+        result = await_scan()
+        # old = result[0]
+        # new = result[1]
 
-        if uid:
-            return jsonify({ 'uid': uid })
+        if result:
+            return jsonify({ 'uid': result })
         else:
             return jsonify({ 'uid': None })
 
