@@ -5,6 +5,8 @@ vault_bp = Blueprint('vault', __name__)
 
 @vault_bp.route('/api/vault', methods=['GET'])
 def get_credentials():
+    
+
     return jsonify({ 'success': True, 'credentials': [] })
 
 
