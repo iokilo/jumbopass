@@ -116,11 +116,12 @@ def rfid_verify():
         conn.commit()
         conn.close()
 
-        if not user or user['rfid_uid'] != rfid_uid:
-            return jsonify({ 'success': False, 'message': 'RFID does not match.' }), 401
+        if user['rfid_uid'] == rfid_uid:
+            session['rfid_verified'] = True
+            return jsonify({ 'success': True })
 
         # both password and RFID verified — grant access
-        return jsonify({ 'success': True })
+        return jsonify({ 'success': False, 'message': 'RFID does not match.' }), 401
 
     except Exception as e:
         print('RFID verify error:', e)
