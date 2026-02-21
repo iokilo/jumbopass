@@ -87,25 +87,108 @@ def connect_reader():
         return None
     return reader
 
+def start_scan(timeout_seconds = 30):
+    """
+    Perform a complete RFID scan cycle: read current tag, then read newly written tag.
+    
+    This method coordinates a two-step authentication process:
+    1. Reads the current RFID tag UID (for verification against database)
+    2. Reads the new RFID tag UID (to be saved to database after verification)
+    
+    Args:
+        timeout_seconds (int): Maximum time to wait for each scan phase (default: 30)
+    
+    Returns:
+        list: A two-element list [current_uid, new_uid] where:
+              - current_uid is the existing tag UID from the database
+              - new_uid is the freshly written tag UID to be stored
+              Either element may be None if that particular scan failed.
+    """
+    reader = connect_reader()
+    if reader is None:
+        return [None, None]
+    
+    try:
+        # Phase 1: Read current tag
+        current_uid = await_scan(timeout_seconds, reader)
+        return current_uid
+        
+        # Phase 2: Read newly written tag
+        # NEW UID NOT IMPLEMENTED RN
+        #new_uid = await_new(timeout_seconds, reader)
+        
+        #print([current_uid, new_uid])
+        #return [current_uid, new_uid]
+    
+    except KeyboardInterrupt:
+        print("Scan cycle terminated.")
+        return None
+        #return [None, None]
+    finally:
+        reader.close()
 
-def await_scan(timeout_seconds = 30):
+
+def await_new(timeout_seconds = 30, reader = None):
+    """
+    Wait for a newly written RFID code from the board.
+    
+    After the Arduino writes a new UID to a tag, this function waits for
+    the board to transmit that new code back over serial. Returns the raw
+    string as formatted by the Arduino.
+    
+    Args:
+        timeout_seconds (int): Maximum time to wait for new code (default: 30)
+        reader (serial.Serial): Existing serial connection, or None to create new one
+    
+    Returns:
+        str: The newly written UID (raw format from Arduino), or None if timeout/error occurred
+    """
+    if reader is None:
+        reader = connect_reader()
+        if reader is None:
+            return None
+    
+    try:
+        start = time.time()
+        while time.time() - start < timeout_seconds:
+            line = reader.readline()
+            if line:
+                try:
+                    decoded = line.decode('utf-8').strip()
+                    if decoded:  # Return any non-empty line
+                        print(f"New tag received: {decoded}")
+                        return decoded
+                except UnicodeDecodeError:
+                    continue
+            time.sleep(0.1)
+        return None  # Timeout
+    except KeyboardInterrupt:
+        print("New tag read terminated.")
+        return None
+    except Exception as e:
+        print(f"New tag read error: {e}")
+        return None
+
+
+def await_scan(timeout_seconds = 30, reader = None):
     """
     Wait for an RFID tag to be scanned within a specified timeout period.
     
     Continuously polls the RFID reader for tag data. When a valid tag is detected,
-    its UID is extracted and returned. The connection is automatically closed when
-    scanning completes, times out, or is interrupted.
+    its UID is extracted and returned.
     
     Args:
         timeout_seconds (int): Maximum time to wait for a scan in seconds (default: 30)
+        reader (serial.Serial): Existing serial connection, or None to create new one
     
     Returns:
         str: The UID of the scanned RFID tag (e.g., "67 AE 7B B4"), or None if
              no tag was scanned within the timeout period or if an error occurred
     """
-    reader = connect_reader()
     if reader is None:
-        return None
+        reader = connect_reader()
+        if reader is None:
+            return None
 
     try:
         start = time.time()
@@ -119,8 +202,7 @@ def await_scan(timeout_seconds = 30):
     except KeyboardInterrupt:
         print("scanning terminated.")
         return None
-    finally:
-        reader.close()
+
 
 def read_tag(reader):
     """
@@ -155,3 +237,5 @@ def read_tag(reader):
     except Exception as e:
         print(f"line read error: {e}")
         return None
+
+start_scan()
