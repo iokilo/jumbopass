@@ -36,7 +36,7 @@ if (loginForm) {
 async function pollLoginRFID(user_id) {
     try {
         // wait for RFID tap
-        const response = await fetch('/api/auth/rfid-test');
+        const response = await fetch('/api/auth/rfid-scan');
         const data = await response.json();
 
         if (data.uid) {
@@ -57,7 +57,8 @@ async function pollLoginRFID(user_id) {
                 document.getElementById('rfid-prompt').style.display = 'none';
             }
         } else {
-            setTimeout(() => pollLoginRFID(user_id), 1000);
+            // setTimeout(() => pollLoginRFID(user_id), 1000);
+            alert('No RFID detected. Please try again.');
         }
     } catch (err) {
         console.error('RFID polling error:', err);
@@ -93,7 +94,7 @@ if (nextBtn) {
 async function pollRFID() {
     try {
         // SWAP TO rfid-scan WHEN READY
-        const response = await fetch('/api/auth/rfid-test');
+        const response = await fetch('/api/auth/rfid-scan');
         const data = await response.json();
 
         if (data.uid) {
@@ -101,7 +102,8 @@ async function pollRFID() {
             document.querySelector('#rfid-section p').textContent = 'Card registered! Click Create Account to finish.';
             document.getElementById('submit-btn').style.display = 'block';
         } else {
-            setTimeout(pollRFID, 1000);
+            // setTimeout(pollRFID, 1000);
+            alert('No RFID detected. Please try again.');
         }
     } catch (err) {
         console.error('RFID polling error:', err);
