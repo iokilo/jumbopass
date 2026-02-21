@@ -3,7 +3,6 @@ CREATE TABLE IF NOT EXISTS users (
   username TEXT UNIQUE NOT NULL,
   password_hash BLOB NOT NULL,
   password_salt BLOB NOT NULL,
-  kdf_params TEXT NOT NULL,
   rfid_uid TEXT
 );
 

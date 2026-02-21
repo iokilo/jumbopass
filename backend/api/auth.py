@@ -21,10 +21,10 @@ def register():
         salt = bcrypt.gensalt()
         hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
         
-        conn = sqlite3.connect('vault.db')
+        conn = sqlite3.connect('backend/db/vault.db')
         cur = conn.cursor()
 
-        cur.execute('INSERT INTO users (username, password_hash, password_salt, rfid_uid) VALUES (?, ?, ?)', (username, hashed, salt, rfid_uid))
+        cur.execute('INSERT INTO users (username, password_hash, password_salt, rfid_uid) VALUES (?, ?, ?, ?)', (username, hashed, salt, rfid_uid))
         conn.commit()
         conn.close()
 
