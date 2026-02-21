@@ -115,3 +115,9 @@ def rfid_verify():
 @auth_bp.route('/api/auth/logout', methods=['POST'])
 def logout():
     return jsonify({ 'success': True })
+
+
+# TESTING
+@auth_bp.route('/api/auth/rfid-test', methods=['GET'])
+def rfid_test():
+    return jsonify({ 'uid': '12345678' })
