@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 import bcrypt
 import sqlite3
 from testrfid import read_rfid
@@ -61,11 +61,15 @@ def login():
         if not user:
             return jsonify({ 'success': False, 'message': 'Invalid credentials.' }), 401
 
-        if not bcrypt.checkpw(password.encode('utf-8'), user['password_hash']):
-            return jsonify({ 'success': False, 'message': 'Invalid credentials.' }), 401
-
-        # password is correct, frontend will now poll for RFID
-        return jsonify({ 'success': True, 'user_id': user['user_id'] })
+        # check password, move on to polling for rfid
+        if bcrypt.checkpw(password.encode('utf-8'), user['password_hash']):
+            session['user_id'] = user['user_id']
+            session['password_verified'] = True
+            session['rfid_verified'] = False
+            return jsonify({ 'success': True })
+            
+        # password is incorrect, fail
+        return jsonify({ 'success': False, 'message': 'Invalid credentials.' }), 401
 
     except Exception as e:
         print('Login error:', e)
