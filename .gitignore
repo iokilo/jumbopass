@@ -2,4 +2,6 @@ backend/db/vault.db
 .venv
 .venv/*
 backend/__pycache__
-api/__pycache__
+backend/api/__pycache__
+backend/__pycache__/*
+backend/api/__pycache__/*
