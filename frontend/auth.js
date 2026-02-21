@@ -9,7 +9,7 @@ if (loginForm) {
         const password = document.getElementById('password').value;
 
         try {
-            // step 1: verify password
+            // verify password
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -35,13 +35,12 @@ if (loginForm) {
 
 async function pollLoginRFID(user_id) {
     try {
-        // step 2: wait for RFID tap
-        // SWAP TO RFID_SCAN WHEN READY
-        const response = await fetch('/api/auth/rfid-test');
+        // wait for RFID tap
+        const response = await fetch('/api/auth/rfid-scan');
         const data = await response.json();
 
         if (data.uid) {
-            // step 3: verify RFID matches the user
+            // verify RFID matches the user
             const verifyResponse = await fetch('/api/auth/rfid-verify', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -90,8 +89,10 @@ if (nextBtn) {
     });
 }
 
+// scan for RFID every second until we get a UID, then show the submit button and message
 async function pollRFID() {
     try {
+        // SWAP TO rfid-scan WHEN READY
         const response = await fetch('/api/auth/rfid-test');
         const data = await response.json();
 
@@ -123,6 +124,7 @@ if (registerForm) {
         }
 
         try {
+            console.log("registering");
             const response = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -132,7 +134,7 @@ if (registerForm) {
             const data = await response.json();
 
             if (data.success) {
-                window.location.href = 'index.html';
+                window.location.href = 'dashboard.html';
             } else {
                 alert('Registration failed: ' + data.message);
             }
