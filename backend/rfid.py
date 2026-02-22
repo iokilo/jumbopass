@@ -237,3 +237,23 @@ def read_tag(reader):
     except Exception as e:
         print(f"line read error: {e}")
         return None
+    
+def write_to_arduino(data, reader = None):
+    """
+    Write a new tag UID to the RFID reader.
+    
+    Args:
+        tag_uid (str): The UID to be written (e.g., "67 AE 7B B4")
+        reader (serial.Serial): Existing serial connection, or None to create new one
+    """
+    if reader is None:
+        reader = connect_reader()
+        if reader is None:
+            return None
+
+    try:
+        reader.write(data)
+        return True 
+    except Exception as e:
+        print(f"write error: {e}")
+        return False

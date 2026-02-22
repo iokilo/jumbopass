@@ -88,8 +88,17 @@ if (nextBtn) {
 
         document.getElementById('rfid-section').style.display = 'block';
         nextBtn.disabled = true;
-        pollRFID();
+        initializeRFID();
+        //pollRFID();
     });
+}
+
+function initializeRFID() {
+    try {
+        fetch('/api/auth/initialize-rfid');
+    } catch (err) {
+        console.error('HMAC key error:', err);
+    }
 }
 
 // scan for RFID every second until we get a UID, then show the submit button and message
@@ -114,6 +123,8 @@ async function pollRFID() {
         setTimeout(pollRFID, 2000);
     }
 }
+
+
 
 const registerForm = document.getElementById('register-form');
 if (registerForm) {
