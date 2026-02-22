@@ -149,7 +149,6 @@ async function pollRFID() {
     }
 }
 
-
 const registerForm = document.getElementById('register-form');
 if (registerForm) {
     registerForm.addEventListener('submit', async function(e) {

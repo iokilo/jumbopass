@@ -2,22 +2,16 @@ from flask import Blueprint, request, jsonify, session
 import bcrypt
 import sqlite3
 from testrfid import read_rfid
-from rfid import await_scan, write_to_arduino
+from rfid import await_scan, write_to_arduino, await_input, MessageType
 import os
 import hmac
 import hashlib
 from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from enum import Enum
 from  dotenv import load_dotenv
 import base64
 
 auth_bp = Blueprint('auth', __name__)
-
-class MessageType(Enum):
-    INITIALIZE = b'\x30'
-    ACK = b'\x31'
-
 
 @auth_bp.route('/api/auth/register', methods=['POST'])
 def register():
@@ -46,19 +40,16 @@ def register():
         vault_key_nonce = os.urandom(12)
         encrypted_vault_key = aesgcm.encrypt(vault_key_nonce, vault_key, None)
 
-        conn = sqlite3.connect('backend/db/vault.db')
-        cur = conn.cursor()
+        with sqlite3.connect('backend/db/vault.db') as conn:
+          cur = conn.cursor()
 
-        cur.execute(
-            '''INSERT INTO users 
-               (username, password_hash, password_salt, encrypted_vault_key, vault_key_nonce) 
-               VALUES (?, ?, ?, ?, ?)''',
-            (username, hashed, bsalt,
-             encrypted_vault_key, vault_key_nonce)
-        )
-
-        conn.commit()
-        conn.close()
+          cur.execute(
+              '''INSERT INTO users 
+                (username, password_hash, password_salt, encrypted_vault_key, vault_key_nonce) 
+                VALUES (?, ?, ?, ?, ?)''',
+              (username, hashed, bsalt,
+              encrypted_vault_key, vault_key_nonce)
+          )
 
         user_id = cur.lastrowid
         session['user_id'] = user_id
@@ -84,16 +75,13 @@ def login():
         return jsonify({ 'success': False, 'message': 'All fields are required.' }), 400
 
     try:
-        conn = sqlite3.connect('backend/db/vault.db')
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
+        with sqlite3.connect('backend/db/vault.db') as conn:
+          conn.row_factory = sqlite3.Row
+          cur = conn.cursor()
 
-        user = cur.execute(
-            'SELECT * FROM users WHERE username = ?', (username,)
-        ).fetchone()
-
-        conn.commit()
-        conn.close()
+          user = cur.execute(
+              'SELECT * FROM users WHERE username = ?', (username,)
+          ).fetchone()
 
         if not user:
             return jsonify({ 'success': False, 'message': 'Invalid credentials.' }), 401
@@ -136,6 +124,12 @@ def initialize_rfid():
         message = MessageType.INITIALIZE.value + secret
         write_to_arduino(message)
 
+        # wait for scanner to verify
+        verif, _ = await_input()
+
+        if not verif:
+            return jsonify({ 'success': False, 'message': 'RFID scanner did not verify.' }), 401
+
         # store secret in db, but enc first
         load_dotenv()
         key = base64.b64decode(os.environ["HMAC_SECRET_KEY"])
@@ -144,17 +138,13 @@ def initialize_rfid():
         nonce = os.urandom(12)
         enc_secret = crypt.encrypt(nonce, secret, None)
 
-        conn = sqlite3.connect('backend/db/vault.db')
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
+        with sqlite3.connect('backend/db/vault.db') as conn:
+          conn.row_factory = sqlite3.Row
+          cur = conn.cursor()
 
-        print("Inserting: %s, %s, %s, %s", session['user_id'], enc_secret, nonce, 0)
-
-        user = cur.execute(
-            'INSERT INTO user_tokens (user_id, secret, nonce, counter) VALUES (?, ?, ?, ?)', (session['user_id'], enc_secret, nonce, 0,)
-        )
-        conn.commit()
-        conn.close()
+          user = cur.execute(
+              'INSERT INTO user_tokens (user_id, secret, nonce, counter) VALUES (?, ?, ?, ?)', (session['user_id'], enc_secret, nonce, 0,)
+          )
 
         return jsonify({ 'success': True })
 
@@ -189,16 +179,13 @@ def rfid_verify():
         return jsonify({ 'success': False, 'message': 'Missing fields.' }), 400
 
     try:
-        conn = sqlite3.connect('backend/db/vault.db')
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
+        with sqlite3.connect('backend/db/vault.db') as conn:
+          conn.row_factory = sqlite3.Row
+          cur = conn.cursor()
 
-        user = cur.execute(
-            "SELECT * FROM users WHERE user_id = ?", (user_id,)
-        ).fetchone()
-
-        conn.commit()
-        conn.close()
+          user = cur.execute(
+              "SELECT * FROM users WHERE user_id = ?", (user_id,)
+          ).fetchone()
 
         if user['rfid_uid'] == rfid_uid:
             session['rfid_verified'] = True

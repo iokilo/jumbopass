@@ -13,6 +13,13 @@ Configuration:
 import serial
 import serial.tools.list_ports
 import time
+from enum import Enum
+
+class MessageType(Enum):
+    INITIALIZE = b'\x30'
+    ACK = b'\x31'
+    SUCCESS = b'\x00'
+    FAILURE = b'\x01'
 
 # --- CONFIG ---
 
@@ -203,6 +210,32 @@ def await_scan(timeout_seconds = 30, reader = None):
         print("scanning terminated.")
         return None
 
+def await_input(timeout_seconds = 30, reader = None):
+    if reader is None:
+        reader = connect_reader()
+        if reader is None:
+            return None
+        
+    try:
+        start = time.time()
+        while time.time() - start < timeout_seconds:
+            line = reader.readline()
+            if line:
+                try:
+                    if line[0] == MessageType.SUCCESS.value:
+                        return True, line[1:]
+                    elif line[0] == MessageType.FAILURE.value:
+                        return False, line[1:]
+                    else:
+                        continue
+                except UnicodeDecodeError:
+                    continue
+            
+            time.sleep(0.1) #delay
+        return None # Function timed out.
+    except KeyboardInterrupt:
+        print("scanning terminated.")
+        return None
 
 def read_tag(reader):
     """
@@ -246,16 +279,15 @@ def write_to_arduino(data, reader = None):
         tag_uid (str): The UID to be written (e.g., "67 AE 7B B4")
         reader (serial.Serial): Existing serial connection, or None to create new one
     """
-    # if reader is None:
-    #     reader = connect_reader()
-    #     if reader is None:
-    #         return None
+    if reader is None:
+        reader = connect_reader()
+        if reader is None:
+            return None
 
-    # try:
-    #     reader.write(data)
-    #     return True 
-    # except Exception as e:
-    #     print(f"write error: {e}")
-    #     return False    
-    print("sending shit to arduino")
-    return True 
+    try:
+        reader.write(data)
+        return True 
+    except Exception as e:
+        print(f"write error: {e}")
+        return False
+    
