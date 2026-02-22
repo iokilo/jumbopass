@@ -26,7 +26,6 @@ void loop() {
   // Now a card is selected. The UID and SAK is in mfrc522.uid.
     Serial.print(F("Card UID:"));
     dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
-    mfrc522.
     Serial.println();
 }
 
