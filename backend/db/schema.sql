@@ -26,7 +26,8 @@ CREATE TABLE IF NOT EXISTS vault_entries (
 CREATE TABLE IF NOT EXISTS user_tokens (
   token_id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
-  secret TEXT NOT NULL,
+  secret BLOB NOT NULL,
+  nonce BLOB NOT NULL,
   counter INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
   revoked INTEGER NOT NULL DEFAULT 0,

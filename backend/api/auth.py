@@ -8,8 +8,14 @@ import hmac
 import hashlib
 from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from enum import Enum
+from  dotenv import load_dotenv
 
 auth_bp = Blueprint('auth', __name__)
+
+class MessageType(Enum):
+    INITIALIZE = b'\x00'
+    ACK = b'\x01'
 
 
 @auth_bp.route('/api/auth/register', methods=['POST'])
@@ -18,9 +24,8 @@ def register():
 
     username = data.get('username')
     password = data.get('password')
-    rfid_uid = data.get('rfid_uid')
 
-    if not username or not password or not rfid_uid:
+    if not username or not password:
         return jsonify({ 'success': False, 'message': 'All fields are required.' }), 400
 
     try:
@@ -45,16 +50,16 @@ def register():
 
         cur.execute(
             '''INSERT INTO users 
-               (username, password_hash, password_salt, rfid_uid, encrypted_vault_key, vault_key_nonce) 
-               VALUES (?, ?, ?, ?, ?, ?)''',
-            (username, hashed, bsalt, rfid_uid,
+               (username, password_hash, password_salt, encrypted_vault_key, vault_key_nonce) 
+               VALUES (?, ?, ?, ?, ?)''',
+            (username, hashed, bsalt,
              encrypted_vault_key, vault_key_nonce)
         )
 
+        session['user_id'] = cur.lastrowid
+
         conn.commit()
         conn.close()
-
-        session['user_id'] = cur.lastrowid
 
         return jsonify({ 'success': True })
 
@@ -116,21 +121,40 @@ def login():
 
 @auth_bp.route('/api/auth/initialize-rfid', methods=['GET'])
 def initialize_rfid():
-    secret = os.urandom(64)
+    if not session.get('user_id'):
+        return jsonify({ 'success': False, 'message': 'No associated user.' }), 401
+    if session.get('password_verified', False) or session.get('rfid_verified', False):
+        return jsonify({ 'success': False, 'message': 'Already initialized.' }), 400
 
-    write_to_arduino(secret)
+    try:
+        # send rfid secret val to arduino
+        secret = os.urandom(64)
+        message = MessageType.INITIALIZE.value + secret
+        write_to_arduino(message)
 
-    conn = sqlite3.connect('backend/db/vault.db')
-    conn.row_factory = sqlite3.Row
-    cur = conn.cursor()
+        # store secret in db, but enc first
+        load_dotenv()
+        key = os.environ["HMAC_SECRET_KEY"]
 
-    user = cur.execute(
-        'INSERT INTO user_tokens (user_id, secret, counter) VALUES (?, ?, ?)', (session['user_id'], secret, 0,)
-    )  
-    conn.commit()
-    conn.close()
+        crypt = AESGCM(key)
+        nonce = os.urandom(12)
+        enc_secret = crypt.encrypt(nonce, secret, None)
 
-    return jsonify({ 'success': True })
+        conn = sqlite3.connect('backend/db/vault.db')
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+
+        user = cur.execute(
+            'INSERT INTO user_tokens (user_id, secret, nonce, counter) VALUES (?, ?, ?, ?)', (session['user_id'], enc_secret, nonce, 0,)
+        )  
+        conn.commit()
+        conn.close()
+
+        return jsonify({ 'success': True })
+
+    except Exception as e:
+        print('Initialize rfid error:', e)
+        return jsonify({ 'success': False, 'message': 'Server error.' }), 500
 
 @auth_bp.route('/api/auth/rfid-scan', methods=['GET'])
 def rfid_scan():

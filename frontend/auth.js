@@ -93,9 +93,14 @@ if (nextBtn) {
     });
 }
 
-function initializeRFID() {
+async function initializeRFID() {
     try {
-        fetch('/api/auth/initialize-rfid');
+        const response = await fetch('/api/auth/initialize-rfid');
+        const data = await response.json();
+
+        if (data.success) {
+          
+        }
     } catch (err) {
         console.error('HMAC key error:', err);
     }
@@ -123,7 +128,6 @@ async function pollRFID() {
         setTimeout(pollRFID, 2000);
     }
 }
-
 
 
 const registerForm = document.getElementById('register-form');
