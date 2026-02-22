@@ -3,7 +3,8 @@
     --hacker-green: #20C20E;
     --green-dim: #20c20e33;
     --gold-dim: #c9a84c33;
-    --dark-bg: #0a0f1e;
+    --dark-bg: #000000;
+    /* --dark-bg: #0a0f1e; */
     --card-bg: #1a1a2e;
     --text-light: #f0e6d3;
     --font-mono: 'Courier New', monospace;
@@ -13,9 +14,88 @@ body {
     background-color: var(--dark-bg);
     color: var(--hacker-green);
     font-family: var(--font-mono);
+    margin-bottom: 50px;
+}
+
+.loginform{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 0;
+}
+
+.input-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.input-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+.loginsubmit {
+    background: none;
+    border: 3px solid var(--hacker-green);
+    border-radius: 50%; 
+    /* padding: 8px; */
+    cursor: pointer;
+    transition: background-color 0.2s;
+    height: 80px;
+    width: 80px;
+}
+
+.loginsubmit:hover {
+    background-color: var(--green-dim);
+}
+
+.loginsubmit img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+#register-btn {
+    display: block;
+    margin-left: auto;
+    background: none;
+    border: 2px solid var(--hacker-green);
+    color: var(--hacker-green);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    padding: 8px 16px;
+    margin: 20px 0;
+    /* border-radius: 8px; */
+    cursor: pointer;
+}
+
+#register-btn:hover {
+    background-color: var(--green-dim);
 }
 
 
+input[type="text"],
+input[type="password"],
+input[type="username"] {
+    border-radius: 15px;
+    /* padding: 15px 60px; */
+    padding-right: 60px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 15px;
+    font: inherit;
+}
+
+.logo {
+    width: 500px;
+    margin: 0 auto 0px auto;
+    display: block;
+}
 
 
 /* DASHBOARD CARD STYLES */

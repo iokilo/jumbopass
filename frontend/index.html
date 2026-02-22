@@ -8,23 +8,27 @@
 </head>
 <body>
     <div class="container">
-        <h1>Welcome to blackbox</h1>
-        <form id="login-form">
-            <!-- Enter your username: -->
-            <input type="text" id="username" name="username" placeholder="username" required>
-            <br>
-            <!-- Enter your password: -->
-            <input type="password" id="password" name="password" placeholder="password" required>
-            <br>
-            <button type="submit">Submit</button>
+        <!-- <h1>Welcome to blackbox</h1> -->
+        <img src="assets/hacklogo.gif" alt="blackbox logo" class="logo">
+        <img src="assets/blackboxlogoer.png" alt="blackbox logo" class="logo">
+        <form id="login-form" class="loginform">
+            <div class="input-row">
+                <div class="input-fields">
+                    <input type="text" id="username" name="username" placeholder="username" required>
+                    <input type="password" id="password" name="password" placeholder="password" required>
+                </div>
+                <button type="submit" class="loginsubmit">
+                    <img src="assets/lockbuttnwebsite.png" alt="submit">
+                </button>
+            </div>
         </form>
 
         <div id="rfid-prompt" style="display:none;">
             <p>Tap your card to complete login...</p>
         </div>
 
-        <p>Don't have an account?</p>
-        <button id="register-btn" onclick="window.location.href='register.html'">Register an Account</button>
+        <!-- <p>Don't have an account?</p> -->
+        <button id="register-btn" onclick="window.location.href='register.html'">> register</button>
     </div>
     <script src="auth.js"></script>
 </body>
