@@ -4,6 +4,8 @@ import sqlite3
 from testrfid import read_rfid
 from rfid import await_scan
 import os
+from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -19,14 +21,34 @@ def register():
     if not username or not password or not rfid_uid:
         return jsonify({ 'success': False, 'message': 'All fields are required.' }), 400
 
-    try:  
-        salt = bcrypt.gensalt()
-        hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
-        
+    try:
+        # hash password for login verification (bcrypt)
+        bsalt = bcrypt.gensalt()
+        hashed = bcrypt.hashpw(password.encode('utf-8'), bsalt)
+
+        # generate vault key
+        vault_key = os.urandom(32)  # 256-bit key
+
+        # derive encryption key from password using scrypt KDF
+        kdf = Scrypt(salt=bsalt, length=32, n=2**14, r=8, p=1)
+        derived_key = kdf.derive(password.encode('utf-8'))
+
+        # encrypt vault key using derived key
+        aesgcm = AESGCM(derived_key)
+        vault_key_nonce = os.urandom(12)
+        encrypted_vault_key = aesgcm.encrypt(vault_key_nonce, vault_key, None)
+
         conn = sqlite3.connect('backend/db/vault.db')
         cur = conn.cursor()
 
-        cur.execute('INSERT INTO users (username, password_hash, password_salt, rfid_uid) VALUES (?, ?, ?, ?)', (username, hashed, salt, rfid_uid))
+        cur.execute(
+            '''INSERT INTO users 
+               (username, password_hash, password_salt, rfid_uid, encrypted_vault_key, vault_key_nonce) 
+               VALUES (?, ?, ?, ?, ?, ?)''',
+            (username, hashed, bsalt, rfid_uid,
+             encrypted_vault_key, vault_key_nonce)
+        )
+
         conn.commit()
         conn.close()
 
