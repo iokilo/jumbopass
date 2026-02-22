@@ -288,3 +288,21 @@ a:hover {
     font-size: 18px;
     font-weight: bold;
 }
+
+.delete-btn {
+    margin-top: 10px;
+    width: 100%;
+    background: none;
+    border: 1px solid red;
+    color: red;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 12px;
+}
+
+.delete-btn:hover {
+    background-color: red;
+    color: var(--dark-bg);
+}

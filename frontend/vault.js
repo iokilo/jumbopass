@@ -40,9 +40,10 @@ function renderCredentials(credentials) {
                 </p>
                 ${cred.url ? `<p><span class="label">URL:</span> <a href="${cred.url}" target="_blank">${cred.url}</a></p>` : ''}
                 ${cred.notes ? `<p><span class="label">Notes:</span> ${cred.notes}</p>` : ''}
+                <button class="delete-btn" data-id="${cred.id}">delete entry</button>
             </div>
         `;
-
+    
         card.querySelector('.card-header').addEventListener('click', function() {
             const body = card.querySelector('.card-body');
             const arrow = card.querySelector('.arrow');
@@ -50,7 +51,13 @@ function renderCredentials(credentials) {
             body.style.display = isOpen ? 'none' : 'block';
             arrow.textContent = isOpen ? '▼' : '▲';
         });
-
+    
+        card.querySelector('.delete-btn').addEventListener('click', function(e) {
+            e.stopPropagation(); // prevent card from collapsing when clicking delete
+            const id = this.dataset.id;
+            deleteCredential(id);
+        });
+    
         grid.appendChild(card);
     });
 
@@ -130,6 +137,27 @@ async function addCredential(name, username, password, url, notes) {
         }
     } catch (err) {
         console.error('Add credential error:', err);
+        alert('Something went wrong. Please try again.');
+    }
+}
+
+async function deleteCredential(id) {
+    if (!confirm('Delete this entry?')) return;
+
+    try {
+        const response = await fetch(`/api/vault/${id}`, {
+            method: 'DELETE'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            loadVault();
+        } else {
+            alert('Failed to delete entry.');
+        }
+    } catch (err) {
+        console.error('Delete error:', err);
         alert('Something went wrong. Please try again.');
     }
 }
