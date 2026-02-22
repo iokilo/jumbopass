@@ -2,8 +2,10 @@ from flask import Blueprint, request, jsonify, session
 import bcrypt
 import sqlite3
 from testrfid import read_rfid
-from rfid import await_scan
+from rfid import await_scan, write_to_arduino
 import os
+import hmac
+import hashlib
 from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
@@ -51,6 +53,8 @@ def register():
 
         conn.commit()
         conn.close()
+
+        session['user_id'] = cur.lastrowid
 
         return jsonify({ 'success': True })
 
@@ -110,6 +114,24 @@ def login():
         return jsonify({ 'success': False, 'message': 'Server error.' }), 500
 
 
+@auth_bp.route('/api/auth/initialize-rfid', methods=['GET'])
+def initialize_rfid():
+    secret = os.urandom(64)
+
+    write_to_arduino(secret)
+
+    conn = sqlite3.connect('backend/db/vault.db')
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    user = cur.execute(
+        'INSERT INTO user_tokens (user_id, secret, counter) VALUES (?, ?, ?)', (session['user_id'], secret, 0,)
+    )  
+    conn.commit()
+    conn.close()
+
+    return jsonify({ 'success': True })
+
 @auth_bp.route('/api/auth/rfid-scan', methods=['GET'])
 def rfid_scan():
     try:
@@ -125,7 +147,6 @@ def rfid_scan():
     except Exception as e:
         print('RFID scan error:', e)
         return jsonify({ 'uid': None }), 500
-
 
 @auth_bp.route('/api/auth/rfid-verify', methods=['POST'])
 def rfid_verify():
@@ -170,3 +191,7 @@ def logout():
 @auth_bp.route('/api/auth/rfid-test', methods=['GET'])
 def rfid_test():
     return jsonify({ 'uid': '12345678' })
+
+# Helper funcs
+def generate_hmac(secret, counter):
+    return hmac.new(secret, counter.to_bytes(8, 'big'), hashlib.sha256).digest()
