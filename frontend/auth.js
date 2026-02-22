@@ -87,9 +87,8 @@ if (nextBtn) {
         }
 
         document.getElementById('rfid-section').style.display = 'block';
-        nextBtn.disabled = true;
-        initializeRFID();
-        //pollRFID();
+        nextBtn.disabled = true;  
+        pollRFID();
     });
 }
 
@@ -99,7 +98,7 @@ async function initializeRFID() {
         const data = await response.json();
 
         if (data.success) {
-          
+
         }
     } catch (err) {
         console.error('HMAC key error:', err);
