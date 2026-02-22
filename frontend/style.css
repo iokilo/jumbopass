@@ -1,17 +1,24 @@
-body {
-    background-color: #0a0f1e;
-    color: #c9a84c;
+:root {
+    --gold: #c9a84c;
+    --hacker-green: #20C20E;
+    --green-dim: #20c20e33;
+    --gold-dim: #c9a84c33;
+    --dark-bg: #0a0f1e;
+    --card-bg: #1a1a2e;
+    --text-light: #f0e6d3;
+    --font-mono: 'Courier New', monospace;
 }
-/* 4a90d9 blue accents */
 
-/*
-COLORS:
-GOLD: #c9a84c
-DARK BLUE: #1a1a2e
-*/
+body {
+    background-color: var(--dark-bg);
+    color: var(--hacker-green);
+    font-family: var(--font-mono);
+}
 
 
-/* DASHBOARD VAULT CARDS */
+
+
+/* DASHBOARD CARD STYLES */
 .grid-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -23,13 +30,13 @@ DARK BLUE: #1a1a2e
 }
 
 .credential-card {
-    background-color: #1a1a2e;
-    border: 1px solid #c9a84c;
+    background-color: var(--card-bg);
+    border: 1px solid var(--hacker-green);
     border-radius: 8px;
     overflow: hidden;
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
-    align-self: start; 
+    align-self: start;
 }
 
 .credential-card:hover {
@@ -42,65 +49,65 @@ DARK BLUE: #1a1a2e
     justify-content: space-between;
     align-items: center;
     padding: 14px 18px;
-    background-color: #1a1a2e;
+    background-color: var(--card-bg);
 }
 
 .card-header h3 {
     margin: 0;
-    color: #c9a84c;
-    font-family: 'Courier New', monospace;
+    color: var(--hacker-green);
+    font-family: var(--font-mono);
 }
 
 .arrow {
-    color: #c9a84c;
+    color: var(--hacker-green);
     font-size: 12px;
 }
 
 .card-body {
     padding: 14px 18px;
-    border-top: 1px solid #c9a84c33;
+    border-top: 1px solid var(--green-dim);
     cursor: default;
 }
 
 .card-body p {
     margin: 6px 0;
-    color: #f0e6d3;
-    font-family: 'Courier New', monospace;
+    color: var(--text-light);
+    font-family: var(--font-mono);
     font-size: 14px;
 }
 
 .label {
-    color: #c9a84c;
+    color: var(--hacker-green);
     font-weight: bold;
 }
 
 .reveal-btn {
     margin-left: 10px;
     background: none;
-    border: 1px solid #c9a84c;
-    color: #c9a84c;
+    border: 1px solid var(--hacker-green);
+    color: var(--hacker-green);
     padding: 2px 8px;
     border-radius: 4px;
     cursor: pointer;
-    font-family: 'Courier New', monospace;
+    font-family: var(--font-mono);
     font-size: 12px;
 }
 
 .reveal-btn:hover {
-    background-color: #c9a84c;
-    color: #1a1a2e;
+    background-color: var(--hacker-green);
+    color: var(--card-bg);
 }
 
 a {
-    color: #c9a84c;
+    color: var(--hacker-green);
     text-decoration: none;
 }
 
 a:visited {
-    color: #c9a84c;
+    color: var(--hacker-green);
 }
 
 a:hover {
-    color: #f0e6d3;
+    color: var(--text-light);
 }
-/* DASHBOARD VAULT CARDS */
+/* DASHBOARD CARD STYLES */
