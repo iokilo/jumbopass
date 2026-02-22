@@ -89,7 +89,6 @@ void loop() {
                               sizeof(count),
                               out,
                               32);
-          EEPROM.update(0, count + 1);
           Serial.print(0x00);
           dump_byte_array(out, 32);
         }  else {
@@ -99,39 +98,14 @@ void loop() {
         mfrc522.PICC_HaltA();
         mfrc522.PCD_StopCrypto1();
 
+    } else if(MSG_TYPE == 0x32){
+        int count = EEPROM.read(0);
+        EEPROM.update(0, count + 1);
+        Serial.print(0x00);
     } else {
       Serial.println("Invalid Message Type!");  
     }
   }
-
-
-  // Look for new cards, and select one if present
-  
-  //printCardUID();
-
-    
-    // 
-
-
-    
-
-    // byte data[16] = {0}; 
-    // int length = sizeof(data) / sizeof(data[0]);
-    // byte sector = 2;
-    // byte blockOff = 1;
-    // byte buffer[16];
-    
-    // if(readDataBlock(sector, blockOff, buffer)){
-    //   Serial.print(F("Data in block ")); Serial.print(2 * 4 + 1); Serial.println(F(":"));
-    //   dump_byte_array(buffer, 16); Serial.println();
-    // }
-
-    // if (writeDataBlock(sector, blockOff, data, length)) {
-    //   Serial.println("Write successful!");
-    // } else {
-    //   Serial.println("Write failed!");
-    // }
-
 }
 
 bool readDataBlock(byte sector, byte blockOffset, byte *outputBuffer){
