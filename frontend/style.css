@@ -1,5 +1,7 @@
 :root {
     --gold: #c9a84c;
+    --hacker-green: #20C20E;
+    --green-dim: #20c20e33;
     --gold-dim: #c9a84c33;
     --dark-bg: #0a0f1e;
     --card-bg: #1a1a2e;
@@ -9,9 +11,11 @@
 
 body {
     background-color: var(--dark-bg);
-    color: var(--gold);
+    color: var(--hacker-green);
     font-family: var(--font-mono);
 }
+
+
 
 
 /* DASHBOARD CARD STYLES */
@@ -27,7 +31,7 @@ body {
 
 .credential-card {
     background-color: var(--card-bg);
-    border: 1px solid var(--gold);
+    border: 1px solid var(--hacker-green);
     border-radius: 8px;
     overflow: hidden;
     cursor: pointer;
@@ -50,18 +54,18 @@ body {
 
 .card-header h3 {
     margin: 0;
-    color: var(--gold);
+    color: var(--hacker-green);
     font-family: var(--font-mono);
 }
 
 .arrow {
-    color: var(--gold);
+    color: var(--hacker-green);
     font-size: 12px;
 }
 
 .card-body {
     padding: 14px 18px;
-    border-top: 1px solid var(--gold-dim);
+    border-top: 1px solid var(--green-dim);
     cursor: default;
 }
 
@@ -73,15 +77,15 @@ body {
 }
 
 .label {
-    color: var(--gold);
+    color: var(--hacker-green);
     font-weight: bold;
 }
 
 .reveal-btn {
     margin-left: 10px;
     background: none;
-    border: 1px solid var(--gold);
-    color: var(--gold);
+    border: 1px solid var(--hacker-green);
+    color: var(--hacker-green);
     padding: 2px 8px;
     border-radius: 4px;
     cursor: pointer;
@@ -90,17 +94,17 @@ body {
 }
 
 .reveal-btn:hover {
-    background-color: var(--gold);
+    background-color: var(--hacker-green);
     color: var(--card-bg);
 }
 
 a {
-    color: var(--gold);
+    color: var(--hacker-green);
     text-decoration: none;
 }
 
 a:visited {
-    color: var(--gold);
+    color: var(--hacker-green);
 }
 
 a:hover {
