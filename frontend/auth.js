@@ -114,7 +114,7 @@ async function pollRFID() {
 
         if (data.uid) {
             document.getElementById('rfid-uid').value = data.uid;
-            document.querySelector('#rfid-section p').textContent = 'Card registered! Click Create Account to finish.';
+            document.querySelector('#rfid-section p').textContent = 'card registered, click create account to finish';
             document.getElementById('submit-btn').style.display = 'block';
         } else {
             // setTimeout(pollRFID, 1000);

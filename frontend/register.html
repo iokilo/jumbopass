@@ -5,32 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        h1{
+            margin-top: 150px;
+            text-align: center;
+            font-size: 3em;
+        }
+    </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>Register for Jumbopass</h1>
-        <form id="register-form">
-            Enter your desired username:
-            <input type="username" id="register-username" name="username" required>
+        <h1>Register with blackbox</h1>
+        <h2 style="text-align: center; margin-bottom: 50px">all your secrets, kept safe</h2>
+        <form id="register-form" class="loginform">
+            <!-- Enter your desired username: -->
+            <input type="username" id="register-username" name="username" placeholder="desired username"required>
             <br>
-            Enter your desired password:
-            <input type="password" id="register-password" name="password" required>
+            <!-- Enter your desired password: -->
+            <input type="password" id="register-password" name="password" placeholder="desired password"required>
             <br>
-            Confirm password: 
-            <input type="password" id="confirm-password" name="confirm-password" required>
+            <!-- Confirm password:  -->
+            <input type="password" id="confirm-password" name="confirm-password" placeholder="confirm password"required>
             <br>
-            <button type="button" id="next">Next</button>
+            <button type="button" id="next" class="next-btn">> next</button>
         
             <!-- hidden until Next is clicked -->
             <div id="rfid-section" style="display:none;">
-                <p>Tap your card to register it...</p>
+                <div class="rfidprompt-inner">
+                <p class="rfidprompt-text">tap your card to finish registration...</p>
+                </div>
                 <input type="hidden" id="rfid-uid" name="rfid_uid">
-                <button type="submit" id="submit-btn" style="display:none;">Create Account</button>
+                <button type="submit" class="next-btn" id="submit-btn" style="display:none;">> create account</button>
             </div>
         </form>
-        <p>Already have an account?</p>
-        <button id="login-btn" onclick="window.location.href='index.html'">Sign In</button>
+        <p>already have an account?</p>
+        <button id="login-btn" class="next-btn" onclick="window.location.href='index.html'">> sign in</button>
     </div>
     <script src="auth.js"></script>
 </body>
