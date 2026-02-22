@@ -191,3 +191,7 @@ def logout():
 @auth_bp.route('/api/auth/rfid-test', methods=['GET'])
 def rfid_test():
     return jsonify({ 'uid': '12345678' })
+
+# Helper funcs
+def generate_hmac(secret, counter):
+    return hmac.new(secret, counter.to_bytes(8, 'big'), hashlib.sha256).digest()

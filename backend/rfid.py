@@ -256,4 +256,4 @@ def write_to_arduino(data, reader = None):
         return True 
     except Exception as e:
         print(f"write error: {e}")
-        return False
+        return False    
