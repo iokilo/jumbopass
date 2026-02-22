@@ -24,8 +24,9 @@ def register():
 
     username = data.get('username')
     password = data.get('password')
+    rfid_uid = data.get('rfid_uid')
 
-    if not username or not password:
+    if not username or not password or not rfid_uid:
         return jsonify({ 'success': False, 'message': 'All fields are required.' }), 400
 
     try:
@@ -50,9 +51,9 @@ def register():
 
         cur.execute(
             '''INSERT INTO users 
-               (username, password_hash, password_salt, encrypted_vault_key, vault_key_nonce) 
-               VALUES (?, ?, ?, ?, ?)''',
-            (username, hashed, bsalt,
+               (username, password_hash, password_salt, rfid_uid, encrypted_vault_key, vault_key_nonce) 
+               VALUES (?, ?, ?, ?, ?, ?)''',
+            (username, hashed, bsalt, rfid_uid,
              encrypted_vault_key, vault_key_nonce)
         )
 
