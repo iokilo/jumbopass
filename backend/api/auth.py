@@ -211,4 +211,4 @@ def rfid_test():
 
 # Helper funcs
 def generate_hmac(secret, counter):
-    return hmac.new(secret, counter.to_bytes(8, 'big'), hashlib.sha256).digest()
+    return hmac.new(secret, counter.to_bytes(2, 'little'), hashlib.sha256).digest()
