@@ -77,7 +77,7 @@ def login():
 
         user = cur.execute(
             'SELECT * FROM users WHERE username = ?', (username,)
-        ).fetchone()   
+        ).fetchone()
 
         conn.commit()
         conn.close()
@@ -85,15 +85,25 @@ def login():
         if not user:
             return jsonify({ 'success': False, 'message': 'Invalid credentials.' }), 401
 
-        # check password, move on to polling for rfid
-        if bcrypt.checkpw(password.encode('utf-8'), user['password_hash']):
-            session['user_id'] = user['user_id']
-            session['password_verified'] = True
-            session['rfid_verified'] = False
-            return jsonify({ 'success': True })
-            
-        # password is incorrect, fail
-        return jsonify({ 'success': False, 'message': 'Invalid credentials.' }), 401
+        # check password
+        if not bcrypt.checkpw(password.encode('utf-8'), user['password_hash']):
+            return jsonify({ 'success': False, 'message': 'Invalid credentials.' }), 401
+
+        # re-derive the encryption key from plaintext password + stored salt
+        kdf = Scrypt(salt=user['password_salt'], length=32, n=2**14, r=8, p=1)
+        derived_key = kdf.derive(password.encode('utf-8'))
+
+        # decrypt vault key using derived key + stored nonce
+        aesgcm = AESGCM(derived_key)
+        vault_key = aesgcm.decrypt(user['vault_key_nonce'], user['encrypted_vault_key'], None)
+
+        # store decrypted vault key in session
+        session['user_id'] = user['user_id']
+        session['vault_key'] = vault_key.hex()  # store as hex string since sessions are JSON
+        session['password_verified'] = True
+        session['rfid_verified'] = False
+
+        return jsonify({ 'success': True })
 
     except Exception as e:
         print('Login error:', e)
