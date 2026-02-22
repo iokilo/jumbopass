@@ -17,13 +17,12 @@ async function loadVault() {
 function renderCredentials(credentials) {
     const vault = document.getElementById('vault-section');
 
-    if (credentials.length === 0) {
-        vault.innerHTML += '<p>No credentials stored yet.</p>';
-        return;
-    }
-
     const grid = document.createElement('div');
     grid.className = 'grid-container';
+
+    if (credentials.length === 0) {
+        // no entries but still show the add card
+    }
 
     credentials.forEach(cred => {
         const card = document.createElement('div');
@@ -55,6 +54,32 @@ function renderCredentials(credentials) {
         grid.appendChild(card);
     });
 
+    // add entry card
+    const addCard = document.createElement('div');
+    addCard.className = 'credential-card';
+    addCard.innerHTML = `
+        <div class="card-header" id="add-card-header">
+            <h3>NEW ENTRY</h3>
+            <span class="add-icon">+</span>
+        </div>
+        <div class="card-body" id="add-card-body" style="display:none;">
+            <input type="text" id="cred-name" placeholder="site name" required>
+            <input type="text" id="cred-username" placeholder="username">
+            <input type="password" id="cred-password" placeholder="password" required>
+            <input type="text" id="cred-url" placeholder="url">
+            <input type="text" id="cred-notes" placeholder="notes">
+            <button class="reveal-btn" style="margin-top: 10px; width: 100%; margin-left: 0;" onclick="submitCredential()">add entry</button>
+        </div>
+    `;
+
+    addCard.querySelector('.card-header').addEventListener('click', function() {
+        const body = addCard.querySelector('.card-body');
+        const arrow = addCard.querySelector('.arrow');
+        const isOpen = body.style.display === 'block';
+        body.style.display = isOpen ? 'none' : 'block';
+    });
+
+    grid.appendChild(addCard);
     vault.appendChild(grid);
 }
 

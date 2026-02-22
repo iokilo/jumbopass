@@ -265,3 +265,26 @@ a:hover {
     color: var(--text-light);
 }
 /* DASHBOARD CARD STYLES */
+
+.card-body input {
+    width: 100%;
+    margin-bottom: 8px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font: inherit;
+    background-color: var(--dark-bg);
+    border: 1px solid var(--hacker-green);
+    color: var(--text-light);
+}
+
+.card-body input:focus {
+    outline: none;
+    border-color: var(--text-light);
+}
+
+.add-icon {
+    color: var(--hacker-green);
+    font-size: 18px;
+    font-weight: bold;
+}
