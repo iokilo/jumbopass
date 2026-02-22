@@ -246,14 +246,16 @@ def write_to_arduino(data, reader = None):
         tag_uid (str): The UID to be written (e.g., "67 AE 7B B4")
         reader (serial.Serial): Existing serial connection, or None to create new one
     """
-    if reader is None:
-        reader = connect_reader()
-        if reader is None:
-            return None
+    # if reader is None:
+    #     reader = connect_reader()
+    #     if reader is None:
+    #         return None
 
-    try:
-        reader.write(data)
-        return True 
-    except Exception as e:
-        print(f"write error: {e}")
-        return False    
+    # try:
+    #     reader.write(data)
+    #     return True 
+    # except Exception as e:
+    #     print(f"write error: {e}")
+    #     return False    
+    print("sending shit to arduino")
+    return True 

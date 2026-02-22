@@ -10,12 +10,13 @@ from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from enum import Enum
 from  dotenv import load_dotenv
+import base64
 
 auth_bp = Blueprint('auth', __name__)
 
 class MessageType(Enum):
-    INITIALIZE = b'\x00'
-    ACK = b'\x01'
+    INITIALIZE = b'\x30'
+    ACK = b'\x31'
 
 
 @auth_bp.route('/api/auth/register', methods=['POST'])
@@ -24,9 +25,8 @@ def register():
 
     username = data.get('username')
     password = data.get('password')
-    rfid_uid = data.get('rfid_uid')
 
-    if not username or not password or not rfid_uid:
+    if not username or not password:
         return jsonify({ 'success': False, 'message': 'All fields are required.' }), 400
 
     try:
@@ -51,16 +51,19 @@ def register():
 
         cur.execute(
             '''INSERT INTO users 
-               (username, password_hash, password_salt, rfid_uid, encrypted_vault_key, vault_key_nonce) 
-               VALUES (?, ?, ?, ?, ?, ?)''',
-            (username, hashed, bsalt, rfid_uid,
+               (username, password_hash, password_salt, encrypted_vault_key, vault_key_nonce) 
+               VALUES (?, ?, ?, ?, ?)''',
+            (username, hashed, bsalt,
              encrypted_vault_key, vault_key_nonce)
         )
 
-        session['user_id'] = cur.lastrowid
-
         conn.commit()
         conn.close()
+
+        user_id = cur.lastrowid
+        session['user_id'] = user_id
+        session['rfid_verified'] = False
+        session['password_verified'] = False
 
         return jsonify({ 'success': True })
 
@@ -120,7 +123,7 @@ def login():
         return jsonify({ 'success': False, 'message': 'Server error.' }), 500
 
 
-@auth_bp.route('/api/auth/initialize-rfid', methods=['GET'])
+@auth_bp.route('/api/auth/initialize-rfid', methods=['POST'])
 def initialize_rfid():
     if not session.get('user_id'):
         return jsonify({ 'success': False, 'message': 'No associated user.' }), 401
@@ -135,7 +138,7 @@ def initialize_rfid():
 
         # store secret in db, but enc first
         load_dotenv()
-        key = os.environ["HMAC_SECRET_KEY"]
+        key = base64.b64decode(os.environ["HMAC_SECRET_KEY"])
 
         crypt = AESGCM(key)
         nonce = os.urandom(12)
@@ -145,9 +148,11 @@ def initialize_rfid():
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
 
+        print("Inserting: %s, %s, %s, %s", session['user_id'], enc_secret, nonce, 0)
+
         user = cur.execute(
             'INSERT INTO user_tokens (user_id, secret, nonce, counter) VALUES (?, ?, ?, ?)', (session['user_id'], enc_secret, nonce, 0,)
-        )  
+        )
         conn.commit()
         conn.close()
 

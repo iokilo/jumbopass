@@ -72,7 +72,8 @@ async function pollLoginRFID(user_id) {
 
 const nextBtn = document.getElementById('next');
 if (nextBtn) {
-    nextBtn.addEventListener('click', function() {
+    nextBtn.addEventListener('click', async function() {
+        const username = document.getElementById('register-username').value;
         const password = document.getElementById('register-password').value;
         const confirm = document.getElementById('confirm-password').value;
 
@@ -85,21 +86,41 @@ if (nextBtn) {
             alert('Passwords do not match.');
             return;
         }
+        
+        const response = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+            alert('Registration failed: ' + data.message);
+            return;
+        }
 
         document.getElementById('rfid-section').style.display = 'block';
         nextBtn.disabled = true;  
-        pollRFID();
+        initializeRFID();
     });
 }
 
 async function initializeRFID() {
     try {
-        const response = await fetch('/api/auth/initialize-rfid');
+        const response = await fetch('/api/auth/initialize-rfid', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
         const data = await response.json();
 
-        if (data.success) {
-
+        if (!data.success) {
+            alert('RFID initialization failed: ' + data.message);
+            return;
         }
+
+        document.querySelector('#rfid-section p').textContent = 'Card registered! Click Create Account to finish.';
+        document.getElementById('submit-btn').style.display = 'block';
     } catch (err) {
         console.error('HMAC key error:', err);
     }
@@ -136,7 +157,6 @@ if (registerForm) {
 
         const username = document.getElementById('register-username').value;
         const password = document.getElementById('register-password').value;
-        const rfid_uid = document.getElementById('rfid-uid').value;
 
         if (!rfid_uid) {
             alert('Please tap your card before submitting.');
@@ -144,16 +164,16 @@ if (registerForm) {
         }
 
         try {
-            console.log("registering");
-            const response = await fetch('/api/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password, rfid_uid })
-            });
+            // console.log("registering");
+            // const response = await fetch('/api/auth/register', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify({ username, password, rfid_uid })
+            // });
 
-            const data = await response.json();
+            // const data = await response.json();
 
-            if (data.success) {
+            if (true) {
                 window.location.href = 'index.html';
             } else {
                 alert('Registration failed: ' + data.message);
