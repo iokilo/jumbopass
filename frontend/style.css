@@ -1,5 +1,106 @@
 body {
     background-color: #0a0f1e;
-    color: #ffffff;
+    color: #c9a84c;
 }
 /* 4a90d9 blue accents */
+
+/*
+COLORS:
+GOLD: #c9a84c
+DARK BLUE: #1a1a2e
+*/
+
+
+/* DASHBOARD VAULT CARDS */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+    padding: 16px 0;
+    align-items: start;
+    width: 90%;
+    margin: 0 auto;
+}
+
+.credential-card {
+    background-color: #1a1a2e;
+    border: 1px solid #c9a84c;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    align-self: start; 
+}
+
+.credential-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(201, 168, 76, 0.2);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    background-color: #1a1a2e;
+}
+
+.card-header h3 {
+    margin: 0;
+    color: #c9a84c;
+    font-family: 'Courier New', monospace;
+}
+
+.arrow {
+    color: #c9a84c;
+    font-size: 12px;
+}
+
+.card-body {
+    padding: 14px 18px;
+    border-top: 1px solid #c9a84c33;
+    cursor: default;
+}
+
+.card-body p {
+    margin: 6px 0;
+    color: #f0e6d3;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+}
+
+.label {
+    color: #c9a84c;
+    font-weight: bold;
+}
+
+.reveal-btn {
+    margin-left: 10px;
+    background: none;
+    border: 1px solid #c9a84c;
+    color: #c9a84c;
+    padding: 2px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+}
+
+.reveal-btn:hover {
+    background-color: #c9a84c;
+    color: #1a1a2e;
+}
+
+a {
+    color: #c9a84c;
+    text-decoration: none;
+}
+
+a:visited {
+    color: #c9a84c;
+}
+
+a:hover {
+    color: #f0e6d3;
+}
+/* DASHBOARD VAULT CARDS */

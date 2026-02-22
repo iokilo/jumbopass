@@ -3,7 +3,9 @@ CREATE TABLE IF NOT EXISTS users (
   username TEXT UNIQUE NOT NULL,
   password_hash BLOB NOT NULL,
   password_salt BLOB NOT NULL,
-  rfid_uid TEXT
+  rfid_uid TEXT,
+  vault_key_nonce TEXT NOT NULL,
+  encrypted_vault_key BLOB NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS vault_entries (
