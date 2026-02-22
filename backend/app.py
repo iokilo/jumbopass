@@ -1,6 +1,7 @@
 import sys
 import os
 from dotenv import load_dotenv
+
 sys.path.insert(0, os.path.dirname(__file__))
 
 from flask import Flask, send_from_directory
@@ -8,6 +9,12 @@ from api.auth import auth_bp
 from api.vault import vault_bp
 
 app = Flask(__name__, static_folder='../frontend', static_url_path='')
+
+# To remove ngrok warning header
+@app.after_request
+def add_header(response):
+    response.headers["ngrok-skip-browser-warning"] = "true"
+    return response
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(vault_bp)
