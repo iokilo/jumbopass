@@ -5,11 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="style.css">
+
 </head>
 <body>
     <div class="container">
         <h1>Welcome to your Dashboard</h1>
-        <p>This is where you can manage your account and view your activity.</p>
+        <div id="vault-section">
+            <h2>Your Vault</h2>
+        </div>
         <button id="logout-btn" onclick="window.location.href='index.html'">Logout</button>
     </div>
+    <div id="add-form">
+        <input type="text" id="cred-name" placeholder="Site name" required>
+        <input type="text" id="cred-username" placeholder="Username">
+        <input type="password" id="cred-password" placeholder="Password" required>
+        <input type="text" id="cred-url" placeholder="URL">
+        <input type="text" id="cred-notes" placeholder="Notes">
+        <button onclick="submitCredential()">Add Entry</button>
+    </div>
+    <script src="vault.js"></script>
+</body>
 </html>
