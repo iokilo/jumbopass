@@ -1,5 +1,3 @@
-# jumbopass
-
 # blackbox 🔒
 
 A cybersecurity-themed password vault with hardware 2FA using RFID. Built for a hackathon.
